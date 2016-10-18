@@ -39,14 +39,6 @@ node[:deploy].each do |app_name, deploy|
         )
     end
     
-    application_environment_file do
-        user deploy[:user]
-        group deploy[:group]
-        path ::File.join(deploy[:deploy_to], "shared")
-        environment_variables deploy[:environment_variables]
-    end
-
-
 	# Import Wordpress database backup from file if it exists
 	mysql_command = "/usr/bin/mysql -h #{deploy[:database][:host]} -u #{deploy[:database][:username]} #{node[:mysql][:server_root_password].blank? ? '' : "-p#{node[:mysql][:server_root_password]}"} #{deploy[:database][:database]}"
 
