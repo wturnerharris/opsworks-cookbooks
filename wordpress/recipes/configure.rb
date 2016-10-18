@@ -19,8 +19,8 @@ keys = response.body
 # Create the Wordpress config file wp-config.php with corresponding values
 node[:deploy].each do |app_name, deploy|
 
-    template "#{deploy[:deploy_to]}/current/wp-config.php" do
-        source "wp-config.php.erb"
+    template "#{deploy[:deploy_to]}/current/wp-config-local.php" do
+        source "wp-config-local.php.erb"
         mode 0660
         group deploy[:group]
 
@@ -37,6 +37,13 @@ node[:deploy].each do |app_name, deploy|
             :host       => (deploy[:database][:host] rescue nil),
             :keys       => (keys rescue nil)
         )
+    end
+    
+    application_environment_file do
+        user deploy[:user]
+        group deploy[:group]
+        path ::File.join(deploy[:deploy_to], "shared")
+        environment_variables deploy[:environment_variables]
     end
 
 
