@@ -6,9 +6,10 @@
 require 'aws-sdk'
 
 s3 = AWS::S3.new
+s3_bucket = node[:wordpress][:s3]
 
 # Set bucket and object name
-obj = s3.buckets[node[:wordpress][:s3]].objects.with_prefix('db').collect(&:key)
+obj = s3.buckets[ s3_bucket ].objects.with_prefix('db').collect(&:key)
 obj.each do |options, block|
     # Read content to variable
     file_content = block.read
