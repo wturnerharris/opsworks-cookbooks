@@ -44,50 +44,19 @@ define('DB_COLLATE', '');
  */
 <%= @keys %>
 
-<% if node['wordpress']['wp_config']['enable_W3TC']==true -%>
-/** 
+<% if node['wordpress']['wp_config']['enable_W3TC']==true -%>/** 
  * Enable W3 Total Cache
  */
 define('WP_CACHE', true); // Added by W3 Total Cache
-define('COOKIE_DOMAIN', '');
-<% end -%>
+define('COOKIE_DOMAIN', '');<% end -%>
 
-<% if node['wordpress']['wp_config']['force_secure_logins']==true -%>
-/**
+<% if node['wordpress']['wp_config']['force_secure_logins']==true -%>/**
  * Secure Logins
  */
 define('FORCE_SSL_LOGIN', true);
-define('FORCE_SSL_ADMIN', true);
-<% end -%>
+define('FORCE_SSL_ADMIN', true);<% end -%>
 
 /**
  * Use external cron
  */
 define('DISABLE_WP_CRON', true);
-
-/**
- * WordPress Database Table prefix.
- *
- * You can have multiple installations in one database if you give each a unique
- * prefix. Only numbers, letters, and underscores please!
- */
-$table_prefix  = 'wp_';
-
-/**
- * WordPress Localized Language, defaults to English.
- *
- * Change this to localize WordPress.  A corresponding MO file for the chosen
- * language must be installed to wp-content/languages. For example, install
- * de.mo to wp-content/languages and set WPLANG to 'de' to enable German
- * language support.
- */
-define ('WPLANG', '');
-
-/* That's all, stop editing! Happy blogging. */
-
-/** WordPress absolute path to the Wordpress directory. */
-if ( !defined('ABSPATH') )
-        define('ABSPATH', dirname(__FILE__) . '/');
-
-/** Sets up WordPress vars and included files. */
-require_once(ABSPATH . 'wp-settings.php');

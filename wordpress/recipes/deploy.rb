@@ -39,22 +39,45 @@ node[:deploy].each do |app_name, deploy|
         )
     end
     
-	# Import Wordpress database backup from file if it exists
-	mysql_command = "/usr/bin/mysql -h #{deploy[:database][:host]} -u #{deploy[:database][:username]} #{node[:mysql][:server_root_password].blank? ? '' : "-p#{node[:mysql][:server_root_password]}"} #{deploy[:database][:database]}"
+    Chef::Log.debug("Importing .htaccess and files from backup...")
+    script 'deploy_files' do
+      interpreter "bash"
+      user "root"
+      cwd "/home/ec2-user"
+      code <<-EOH
+        HOME=/home/ec2-user
+        FILE=$(ls -t entre* | head -1)
+        ROOT=/srv/www/era/current
 
-	Chef::Log.debug("Importing Wordpress database backup...")
-	script "memory_swap" do
-		interpreter "bash"
-		user "root"
-		cwd "#{deploy[:deploy_to]}/current/"
-		code <<-EOH
-			if ls #{deploy[:deploy_to]}/current/*.sql &> /dev/null; then 
-				#{mysql_command} < #{deploy[:deploy_to]}/current/*.sql;
-				rm #{deploy[:deploy_to]}/current/*.sql;
-			fi;
-		EOH
-	end
-	
+        cd $HOME
+        pwd
+        tar -xvzf $FILE
+        ls -la
+        cp $HOME/htaccess $ROOT/.htaccess
+        rm -rf $ROOT/wp-content/uploads
+        mv $HOME/files_develop $ROOT/wp-content/uploads
+        ls -la
+        
+        EOH
+      not_if { ::File.exists?("/home/ec2-user/files_develop") }
+    end
+
+    # Import Wordpress database backup from file if it exists
+    mysql_command = "/usr/bin/mysql -h #{deploy[:database][:host]} -u #{deploy[:database][:username]} #{node[:mysql][:server_root_password].blank? ? '' :  "-p#{node[:mysql][:server_root_password]}"} #{deploy[:database][:database]}"
+
+    Chef::Log.debug("Importing Wordpress database backup...")
+    script "memory_swap" do
+      interpreter "bash"
+      user "root"
+      cwd "#{deploy[:deploy_to]}/current/"
+      code <<-EOH
+        if ls #{deploy[:deploy_to]}/current/*.sql &> /dev/null; then 
+        #{mysql_command} < #{deploy[:deploy_to]}/current/*.sql;
+        rm #{deploy[:deploy_to]}/current/*.sql;
+        fi;
+        EOH
+    end
+
 end
 
 # Create a Cronjob for Wordpress
