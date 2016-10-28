@@ -73,6 +73,3 @@ if (isset($_SERVER['HTTP_HOST'])) {
     define('WP_HOME', $scheme . '://' . $_SERVER['HTTP_HOST']);
     define('WP_SITEURL', $scheme . '://' . $_SERVER['HTTP_HOST']);
 }
-printf("<pre>%s</pre>", print_r(array(
-    $_SERVER
-), true)); exit;
