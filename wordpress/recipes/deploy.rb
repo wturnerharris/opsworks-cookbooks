@@ -71,7 +71,7 @@ node[:deploy].each do |app_name, deploy|
         ls -la
         
         EOH
-      not_if { ::File.exists?("/home/ec2-user/files_develop") }
+      not_if { ::File.exists?("#{home}/files_develop") }
     end
 
     # Import Wordpress database backup from file if it exists
@@ -85,11 +85,27 @@ node[:deploy].each do |app_name, deploy|
       code <<-EOH
         HOME=#{home}
         FILE=$(ls -t entre*database.sql.gz | head -1)
+        ROOT=#{deploy[:deploy_to]}/current
+        WPCLI=`wp --info`
 
         if [ -f $FILE ]; then 
           #{mysql_command} < $FILE;
           rm $FILE;
         fi;
+        
+        if ! type "$WPCLI" &>/dev/null; then 
+          cd $HOME
+          curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          php wp-cli.phar --info
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+        else
+          cd $ROOT
+          wp search-replace 'develop-entrepreneurs-roundtable-accelerator.pantheonsite.io' 'test.eranyc.com' --allow-root
+          wp search-replace 'ec2-52-15-34-117.us-east-2.compute.amazonaws.com' 'test.eranyc.com' --allow-root
+          wp search-replace 'era.dev' 'test.eranyc.com' --allow-root
+          wp search-replace 'http://test.eranyc.com' 'https://test.eranyc.com' --allow-root
+        fi
 
         EOH
     end
