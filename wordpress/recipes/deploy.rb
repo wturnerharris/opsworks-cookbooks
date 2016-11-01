@@ -39,7 +39,7 @@ node[:deploy].each do |app_name, deploy|
         )
     end
 
-    Chef::Log.debug("Deploying .htaccess template...")
+    Chef::Log.info("Deploying .htaccess template...")
     template "#{deploy[:deploy_to]}/current/.htaccess" do
         source "htaccess.erb"
         mode 0660
@@ -52,7 +52,7 @@ node[:deploy].each do |app_name, deploy|
         end
     end
     
-    Chef::Log.debug("Importing files from backup...")
+    Chef::Log.info("Importing files from backup...")
     script 'deploy_files' do
       interpreter "bash"
       user "root"
@@ -77,7 +77,7 @@ node[:deploy].each do |app_name, deploy|
     # Import Wordpress database backup from file if it exists
     mysql_command = "/usr/bin/mysql -h #{deploy[:database][:host]} -u #{deploy[:database][:username]} #{node[:mysql][:server_root_password].blank? ? '' :  "-p#{node[:mysql][:server_root_password]}"} #{deploy[:database][:database]}"
 
-    Chef::Log.debug("Importing Wordpress database from backup...")
+    Chef::Log.info("Importing Wordpress database from backup...")
     script "import_sql" do
       interpreter "bash"
       user "root"
