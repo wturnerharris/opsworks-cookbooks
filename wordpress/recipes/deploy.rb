@@ -38,6 +38,19 @@ node[:deploy].each do |app_name, deploy|
             :keys       => (keys rescue nil)
         )
     end
+
+    Chef::Log.debug("Deploying .htaccess template...")
+    template "#{deploy[:deploy_to]}/current/.htaccess" do
+        source "htaccess.erb"
+        mode 0660
+        group deploy[:group]
+
+        if platform?("ubuntu")
+          owner "www-data"
+        elsif platform?("amazon")
+          owner "apache"
+        end
+    end
     
     Chef::Log.debug("Importing .htaccess and files from backup...")
     script 'deploy_files' do
