@@ -90,7 +90,6 @@ node[:deploy].each do |app_name, deploy|
 
         if [ -f $FILE ]; then 
           #{mysql_command} < $FILE;
-          rm $FILE;
         fi;
         
         if ! type "$WPCLI" &>/dev/null; then 
